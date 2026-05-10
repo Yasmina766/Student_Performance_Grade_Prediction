@@ -56,9 +56,9 @@ def train_models():
         data['parental_level_of_education'].astype(str).str.strip().str.lower()
     )
 
-    # Drop unused column then remove rows with missing values
-    data.drop(columns=['roll_no'], inplace=True)
+    # Drop rows with missing values, then drop unused column
     data.dropna(inplace=True)
+    data.drop(columns=['roll_no'], inplace=True)
 
     # Outlier removal using IQR x3
     for col in ['math_score', 'reading_score', 'writing_score', 'science_score']:
