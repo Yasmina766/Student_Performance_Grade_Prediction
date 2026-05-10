@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter('ignore')
+
 import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -7,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-
+# ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Student Grade Prediction",
     page_icon="🎓",
@@ -18,7 +21,7 @@ st.caption("Supervised Classification · Decision Tree · Random Forest · KNN")
 st.divider()
 
 
-
+# ── Data loading & model training ──────────────────────────────────────────────
 @st.cache_data
 def train_models():
     data = pd.read_csv('Student_performance_10k.csv')
@@ -27,7 +30,7 @@ def train_models():
     for col in ['math_score', 'reading_score', 'writing_score', 'science_score', 'total_score']:
         data[col] = pd.to_numeric(data[col].astype(str).str.strip(), errors='coerce')
 
-    # Clean gender — handle 'Boy', 'Girl', literal '\\t' prefix
+    # Clean gender — handle 'Boy', 'Girl', literal '\t' prefix
     data['gender'] = (
         data['gender']
         .astype(str).str.strip()
@@ -105,13 +108,14 @@ def train_models():
     return results, le_target, encoders, scaler, X.columns.tolist()
 
 
-
+# ── Train ───────────────────────────────────────────────────────────────────────
 with st.spinner("Training models, please wait..."):
     results, le_target, encoders, scaler, feature_names = train_models()
 
 best = max(results, key=lambda k: results[k]['accuracy'])
 
 
+# ── Model performance ───────────────────────────────────────────────────────────
 st.subheader("📊 Model Performance")
 cols = st.columns(3)
 for i, (name, res) in enumerate(results.items()):
@@ -126,7 +130,7 @@ for i, (name, res) in enumerate(results.items()):
 st.divider()
 
 
-
+# ── Prediction form ─────────────────────────────────────────────────────────────
 st.subheader("🔍 Predict a Student's Grade")
 
 with st.form("predict_form"):
@@ -153,7 +157,7 @@ with st.form("predict_form"):
     submitted = st.form_submit_button("🎯 Predict Grade", use_container_width=True)
 
 
-
+# ── Prediction output ───────────────────────────────────────────────────────────
 if submitted:
     lunch_val     = 1 if lunch     == "Standard"  else 0
     test_prep_val = 1 if test_prep == "Completed" else 0
